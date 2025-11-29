@@ -1,47 +1,43 @@
-import React, { useEffect, useState, type FormEvent } from "react";
-import { getCountries } from "../services/api";
+import type { FormEvent } from "react"
 
-interface HolidayFormProps {
-  onSearch: (country: string) => void;
+
+
+interface Props {
+countries: string[]
+selectedCountry: string
+setSelectedCountry: (c: string) => void
+onSearch: () => void
+loading?: boolean
 }
 
-const HolidayForm: React.FC<HolidayFormProps> = ({ onSearch }) => {
-  const [countries, setCountries] = useState<string[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
 
-  // Fetch countries on mount
-  useEffect(() => {
-    const fetchCountries = async () => {
-      const data = await getCountries();
-      setCountries(data);
-    };
-    fetchCountries();
-  }, []);
+const HolidayForm: React.FC<Props> = ({ countries, selectedCountry, setSelectedCountry, onSearch, loading }) => {
+const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+e.preventDefault() // IMPORTANT: prevent page refresh
+onSearch()
+}
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (selectedCountry) onSearch(selectedCountry);
-  };
 
-  return (
-    <form id="holiday-form" onSubmit={handleSubmit}>
-      <select
-        id="country-select"
-        value={selectedCountry}
-        onChange={(e) => setSelectedCountry(e.target.value)}
-      >
-        <option value="">Select a country</option>
-        {countries.map((country) => (
-          <option key={country} value={country}>
-            {country}
-          </option>
-        ))}
-      </select>
-      <button type="submit" id="fetch-holidays">
-        Fetch Holidays
-      </button>
-    </form>
-  );
-};
+return (
+<form id="holiday-form" onSubmit={handleSubmit}>
+<div className="form-row">
+<select id="country-select" value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)}>
+<option value="">Select a country</option>
+{countries.map((c) => (
+<option key={c} value={c}>
+{c}
+</option>
+))}
+</select>
 
-export default HolidayForm;
+
+<button id="fetch-holidays" type="submit" disabled={!selectedCountry || loading}>
+{loading ? 'Loading...' : 'Fetch Holidays'}
+</button>
+</div>
+</form>
+)
+}
+
+
+export default HolidayForm

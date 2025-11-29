@@ -1,23 +1,21 @@
-import React from "react";
-import type { Holiday } from "../type/Holiday";
+import React from 'react'
+
+import HolidayCard from './HolidayCard'
+import type { Holiday } from '../types/Holiday'
 
 
-interface HolidayListProps {
-  holidays: Holiday[];
+interface Props { holidays: Holiday[] }
+
+
+const HolidayList: React.FC<Props> = ({ holidays }) => {
+return (
+<div id="holiday-list">
+{holidays.map((h) => (
+<HolidayCard key={`${h.Date}-${h['Holiday Name']}`} holiday={h} />
+))}
+</div>
+)
 }
 
-const HolidayList: React.FC<HolidayListProps> = ({ holidays }) => {
-  return (
-    <div id="holiday-list">
-      {holidays.map((holiday) => (
-        <div key={holiday.Date} className="holiday-card">
-          <h3>{holiday["Holiday Name"]}</h3>
-          <p>Date: {holiday.Date}</p>
-          <p>Type: {holiday.Type}</p>
-        </div>
-      ))}
-    </div>
-  );
-};
 
-export default HolidayList;
+export default HolidayList

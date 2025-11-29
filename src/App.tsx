@@ -1,26 +1,72 @@
-import React, { useState } from "react";
-import HolidayForm from "./components/HolidayForm";
-import HolidayList from "./components/HolidayList";
+import React, { useEffect, useState } from 'react'
+import HolidayList from './components/HolidayList'
+import HolidayForm from './components/HolidayForm'
+import { fetchCountries, fetchHolidays } from './api/holidayApi'
+import type { Holiday } from './types/Holiday'
 import './App.css'
 
-import { getHolidays } from "./services/api";
-import type { Holiday } from "./type/Holiday";
-
 const App: React.FC = () => {
-  const [holidays, setHolidays] = useState<Holiday[]>([]);
+const [countries, setCountries] = useState<string[]>([])
+const [selectedCountry, setSelectedCountry] = useState<string>('')
+const [holidays, setHolidays] = useState<Holiday[]>([])
+const [loading, setLoading] = useState(false)
+const [error, setError] = useState('')
 
-  const handleSearch = async (country: string) => {
-    const data = await getHolidays(country);
-    setHolidays(data);
-  };
 
-  return (
-    <div className="App">
-      <h1>Public Holidays Tracker</h1>
-      <HolidayForm onSearch={handleSearch} />
-      <HolidayList holidays={holidays} />
-    </div>
-  );
-};
+useEffect(() => {
+const loadCountries = async () => {
+try {
+const data = await fetchCountries()
+setCountries(data)
+} catch (err) {
+console.error(err)
+}
+}
+void loadCountries()
+}, [])
 
-export default App;
+
+const handleSearch = async () => {
+if (!selectedCountry) return
+setLoading(true)
+setError('')
+try {
+const data = await fetchHolidays(selectedCountry)
+setHolidays(data)
+} catch (err) {
+console.error(err)
+setError('Failed to fetch holidays')
+setHolidays([])
+} finally {
+setLoading(false)
+}
+}
+
+
+return (
+<div className="app-container">
+<div className="header">
+<h1>Public Holidays Tracker</h1>
+</div>
+
+
+<HolidayForm
+countries={countries}
+selectedCountry={selectedCountry}
+setSelectedCountry={setSelectedCountry}
+onSearch={handleSearch}
+loading={loading}
+/>
+
+
+{error && <div className="error">{error}</div>}
+{loading && <div className="loading">Loading holidays...</div>}
+
+
+<HolidayList holidays={holidays} />
+</div>
+)
+}
+
+
+export default App

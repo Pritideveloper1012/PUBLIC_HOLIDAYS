@@ -7,8 +7,3 @@ export interface Holiday {
   Type: string;
   Comments: string;
 }
-
-export interface Country {
-  name: string;
-  code: string;
-}
